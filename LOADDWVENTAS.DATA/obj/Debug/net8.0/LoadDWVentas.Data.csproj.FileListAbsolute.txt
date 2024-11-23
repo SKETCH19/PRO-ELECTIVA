@@ -1,0 +1,28 @@
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.deps.json
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.runtimeconfig.json
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.dll
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.pdb
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.csproj.AssemblyReference.cache
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.AssemblyInfoInputs.cache
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.AssemblyInfo.cs
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.csproj.CoreCompileInputs.cache
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.dll
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\refint\LoadDWVentas.Data.dll
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.pdb
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.genruntimeconfig.cache
+C:\Users\phipp\source\repos\LOADDWVENTAS\LOADDWVENTAS.DATA\obj\Debug\net8.0\ref\LoadDWVentas.Data.dll
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.csproj.AssemblyReference.cache
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.AssemblyInfoInputs.cache
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.AssemblyInfo.cs
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.csproj.CoreCompileInputs.cache
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.deps.json
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.runtimeconfig.json
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.dll
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\bin\Debug\net8.0\LoadDWVentas.Data.pdb
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.dll
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\refint\LoadDWVentas.Data.dll
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.pdb
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\LoadDWVentas.Data.genruntimeconfig.cache
+C:\Users\phipp\OneDrive\Documents\Projecto Electiva\LOADDWVENTAS.DATA\obj\Debug\net8.0\ref\LoadDWVentas.Data.dll
