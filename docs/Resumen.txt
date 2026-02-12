@@ -1,0 +1,60 @@
+Resumen simple y detallado del proyecto
+
+Que hace este proyecto
+- Lee datos de la base Northwind, que es el origen.
+- Pasa esos datos a un Data Warehouse llamado DWHNorthwindOrders.
+- Organiza la informacion en tablas que son faciles de analizar.
+- Deja los datos listos para Power BI.
+
+Que significa cada parte
+- Dimensiones: son listas que describen la informacion.
+  - Dim_Cliente: quien compra.
+  - Dim_Producto: que se vende y su categoria.
+  - Dim_Empleado: quien atiende la venta.
+  - Dim_Shipper: quien envia.
+  - Dim_Tiempo: cuando paso la venta.
+- Hechos: son los eventos principales.
+  - Fact_Ventas: cada venta con cantidad, precio, descuento y total.
+  - Fact_ClienteAtendido: tiempos de atencion y monto asociado.
+- Vistas: son consultas listas para leer rapido.
+
+Como funciona paso a paso
+1) El WorkerService se ejecuta en segundo plano.
+2) Se conecta a dos bases:
+   - Northwind (origen)
+   - DWHNorthwindOrders (destino)
+3) Carga primero el tiempo:
+   - Busca las fechas de pedidos en Northwind.
+   - Si una fecha no existe en Dim_Tiempo, la agrega.
+4) Carga las dimensiones:
+   - Clientes: copia CustomerID, CompanyName y Country.
+   - Productos: combina productos con categorias.
+   - Empleados: copia nombre y apellido.
+   - Shippers: copia empresa y telefono.
+5) Carga hechos de ventas:
+   - Une Order Details con Orders.
+   - Calcula SaleAmount = Quantity * UnitPrice * (1 - Discount).
+   - Usa TiempoID segun la fecha del pedido.
+6) Carga hechos de cliente atendido:
+   - Usa fechas para calcular tiempo de respuesta y resolucion.
+   - Guarda monto de la transaccion.
+7) Evita duplicados revisando claves antes de insertar.
+8) Guarda todo en el DWH y registra un resumen en el log.
+
+Que necesitas para que funcione
+- Un SQL Server accesible desde el entorno.
+- La base Northwind con datos.
+- La base DWHNorthwindOrders creada con tablas.
+- Connection strings correctos en appsettings.json.
+- Ejecutar el script SQL de vistas e indices.
+
+Que produce para Power BI
+- Vistas base:
+  - vwFactVentas
+  - vwFactClienteAtendido
+- Vistas opcionales (resumen):
+  - vwVentasPorMes
+  - vwVentasPorCategoria
+  - vwServicioClientePorMes
+
+Con eso puedes crear dashboards de ventas y servicio al cliente sin complicarte.
