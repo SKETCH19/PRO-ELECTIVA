@@ -31,21 +31,21 @@ namespace LOADDWVENTAS.WorkerService
 
                     try
                     {
-                        // Llamadas a los métodos de carga
+                        // Llamadas a los mï¿½todos de carga
                         await dataService.LoadTiempoAsync();
-                        _logger.LogInformation("Dimensión de Tiempo cargada.");
+                        _logger.LogInformation("Dimensiï¿½n de Tiempo cargada.");
 
                         await dataService.LoadClientesAsync();
-                        _logger.LogInformation("Dimensión de Clientes cargada.");
+                        _logger.LogInformation("Dimensiï¿½n de Clientes cargada.");
 
                         await dataService.LoadProductosAsync();
-                        _logger.LogInformation("Dimensión de Productos cargada.");
+                        _logger.LogInformation("Dimensiï¿½n de Productos cargada.");
 
                         await dataService.LoadEmpleadosAsync();
-                        _logger.LogInformation("Dimensión de Empleados cargada.");
+                        _logger.LogInformation("Dimensiï¿½n de Empleados cargada.");
 
                         await dataService.LoadShippersAsync();
-                        _logger.LogInformation("Dimensión de Shippers cargada.");
+                        _logger.LogInformation("Dimensiï¿½n de Shippers cargada.");
 
                         await dataService.LoadVentasAsync();
                         _logger.LogInformation("Hechos de Ventas cargados.");
@@ -59,17 +59,6 @@ namespace LOADDWVENTAS.WorkerService
 
                         var clientesAtendidos = await dataService.GetFactClienteAtendidoAsync();
                         _logger.LogInformation("Datos obtenidos de vwFactClienteAtendido: {count} registros.", clientesAtendidos.Count);
-
-                        // Opcional: realizar otras operaciones con los datos obtenidos
-                        foreach (var venta in ventas)
-                        {
-                            _logger.LogInformation("VentaID: {id}, SaleAmount: {amount}", venta.VentaID, venta.SaleAmount);
-                        }
-
-                        foreach (var cliente in clientesAtendidos)
-                        {
-                            _logger.LogInformation("ClienteAtendidoID: {id}, MontoTransaccion: {monto}", cliente.ClienteAtendidoID, cliente.MontoTransaccion);
-                        }
                     }
                     catch (Exception ex)
                     {
@@ -77,7 +66,7 @@ namespace LOADDWVENTAS.WorkerService
                     }
                 }
 
-                // Espera antes de la siguiente ejecución
+                // Espera antes de la siguiente ejecuciï¿½n
                 await Task.Delay(TimeSpan.FromHours(7), stoppingToken);
             }
         }

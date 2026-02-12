@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -32,11 +33,11 @@ namespace LoadDWVentas.Data.Services
                 await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Fact_ClienteAtendido");
 
                 // Limpia las tablas de dimensiones
-                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM DimTiempo");
-                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM DimCliente");
-                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM DimProducto");
-                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM DimEmpleado");
-                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM DimShipper");
+                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Dim_Tiempo");
+                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Dim_Cliente");
+                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Dim_Producto");
+                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Dim_Empleado");
+                await _dwhContext.Database.ExecuteSqlRawAsync("DELETE FROM Dim_Shipper");
 
                 _logger.LogInformation("Limpieza de tablas completada con éxito.");
             }
@@ -49,115 +50,167 @@ namespace LoadDWVentas.Data.Services
 
         public async Task LoadClientesAsync()
         {
-            var clientes = _northwindContext.Customers.ToList();
-            foreach (var cliente in clientes)
-            {
-                var dimCliente = new DimCliente
+            var existingIds = new HashSet<string>(
+                await _dwhContext.DimCliente.AsNoTracking()
+                    .Select(c => c.CustomerID)
+                    .ToListAsync());
+
+            var clientes = await _northwindContext.Customers
+                .AsNoTracking()
+                .Select(cliente => new DimCliente
                 {
                     CustomerID = cliente.CustomerID ?? "Unknown",
                     CompanyName = cliente.CompanyName ?? "N/A",
                     Country = cliente.Country ?? "Unknown"
-                };
+                })
+                .ToListAsync();
 
-                if (!_dwhContext.DimCliente.Any(c => c.CustomerID == dimCliente.CustomerID))
-                {
-                    _dwhContext.DimCliente.Add(dimCliente);
-                }
+            var nuevos = clientes
+                .Where(c => !existingIds.Contains(c.CustomerID))
+                .ToList();
+
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("Clientes: sin nuevos registros.");
+                return;
             }
 
+            _dwhContext.DimCliente.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Clientes cargados con éxito.");
+            _logger.LogInformation("Clientes cargados con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadProductosAsync()
         {
-            var productos = _northwindContext.Products
-                .Join(_northwindContext.Categories, p => p.CategoryID, c => c.CategoryID, (p, c) => new { p, c })
-                .ToList();
+            var existingIds = new HashSet<int>(
+                await _dwhContext.DimProducto.AsNoTracking()
+                    .Select(p => p.ProductID)
+                    .ToListAsync());
 
-            foreach (var item in productos)
-            {
-                var dimProducto = new DimProducto
+            var productos = await _northwindContext.Products
+                .AsNoTracking()
+                .Join(_northwindContext.Categories.AsNoTracking(), p => p.CategoryID, c => c.CategoryID, (p, c) => new { p, c })
+                .Select(item => new DimProducto
                 {
                     ProductID = item.p.ProductID,
                     ProductName = item.p.ProductName ?? "Unnamed",
                     CategoryID = item.c.CategoryID,
                     CategoryName = item.c.CategoryName ?? "Uncategorized",
                     UnitPrice = item.p.UnitPrice ?? 0.0m
-                };
+                })
+                .ToListAsync();
 
-                if (!_dwhContext.DimProducto.Any(p => p.ProductID == dimProducto.ProductID))
-                {
-                    _dwhContext.DimProducto.Add(dimProducto);
-                }
+            var nuevos = productos
+                .Where(p => !existingIds.Contains(p.ProductID))
+                .ToList();
+
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("Productos: sin nuevos registros.");
+                return;
             }
 
+            _dwhContext.DimProducto.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Productos cargados con éxito.");
+            _logger.LogInformation("Productos cargados con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadEmpleadosAsync()
         {
-            var empleados = _northwindContext.Employees.ToList();
-            foreach (var empleado in empleados)
-            {
-                var dimEmpleado = new DimEmpleado
+            var existingIds = new HashSet<int>(
+                await _dwhContext.DimEmpleado.AsNoTracking()
+                    .Select(e => e.EmployeeID)
+                    .ToListAsync());
+
+            var empleados = await _northwindContext.Employees
+                .AsNoTracking()
+                .Select(empleado => new DimEmpleado
                 {
                     EmployeeID = empleado.EmployeeID,
                     LastName = empleado.LastName,
                     FirstName = empleado.FirstName
-                };
+                })
+                .ToListAsync();
 
-                if (!_dwhContext.DimEmpleado.Any(e => e.EmployeeID == dimEmpleado.EmployeeID))
-                {
-                    _dwhContext.DimEmpleado.Add(dimEmpleado);
-                }
+            var nuevos = empleados
+                .Where(e => !existingIds.Contains(e.EmployeeID))
+                .ToList();
+
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("Empleados: sin nuevos registros.");
+                return;
             }
 
+            _dwhContext.DimEmpleado.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Empleados cargados con éxito.");
+            _logger.LogInformation("Empleados cargados con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadShippersAsync()
         {
-            var shippers = _northwindContext.Shippers.ToList();
-            foreach (var shipper in shippers)
-            {
-                var dimShipper = new DimShipper
+            var existingIds = new HashSet<int>(
+                await _dwhContext.DimShipper.AsNoTracking()
+                    .Select(s => s.ShipperID)
+                    .ToListAsync());
+
+            var shippers = await _northwindContext.Shippers
+                .AsNoTracking()
+                .Select(shipper => new DimShipper
                 {
                     ShipperID = shipper.ShipperID,
                     CompanyName = shipper.CompanyName,
                     Phone = shipper.Phone ?? "N/A"
-                };
+                })
+                .ToListAsync();
 
-                if (!_dwhContext.DimShipper.Any(s => s.ShipperID == dimShipper.ShipperID))
-                {
-                    _dwhContext.DimShipper.Add(dimShipper);
-                }
+            var nuevos = shippers
+                .Where(s => !existingIds.Contains(s.ShipperID))
+                .ToList();
+
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("Shippers: sin nuevos registros.");
+                return;
             }
 
+            _dwhContext.DimShipper.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Shippers cargados con éxito.");
+            _logger.LogInformation("Shippers cargados con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadVentasAsync()
         {
-            var ventas = _northwindContext.OrderDetails
-                .Join(_northwindContext.Orders, od => od.OrderID, o => o.OrderID, (od, o) => new { od, o })
-                .ToList();
+            var tiempoMap = await _dwhContext.DimTiempo.AsNoTracking()
+                .ToDictionaryAsync(t => t.Fecha, t => t.TiempoID);
+
+            var existingKeys = await _dwhContext.Fact_Ventas.AsNoTracking()
+                .Select(f => new { f.OrderID, f.ProductID })
+                .ToListAsync();
+
+            var existingKeySet = new HashSet<(int OrderID, int ProductID)>(
+                existingKeys.Select(k => (k.OrderID, k.ProductID)));
+
+            var ventas = await _northwindContext.OrderDetails.AsNoTracking()
+                .Join(_northwindContext.Orders.AsNoTracking(), od => od.OrderID, o => o.OrderID, (od, o) => new { od, o })
+                .ToListAsync();
+
+            var nuevos = new List<Fact_Ventas>();
 
             foreach (var venta in ventas)
             {
-                var tiempo = _dwhContext.DimTiempo.FirstOrDefault(t => t.Fecha == venta.o.OrderDate);
-                int tiempoID = tiempo != null ? tiempo.TiempoID : 0;
+                if (existingKeySet.Contains((venta.o.OrderID, venta.od.ProductID)))
+                {
+                    continue;
+                }
 
-                if (tiempoID == 0)
+                if (venta.o.OrderDate == null || !tiempoMap.TryGetValue(venta.o.OrderDate.Value, out var tiempoID))
                 {
                     _logger.LogWarning("No se encontró TiempoID para la fecha {0} de OrderID {1}.", venta.o.OrderDate, venta.o.OrderID);
                     continue;
                 }
 
-                var factVenta = new Fact_Ventas
+                nuevos.Add(new Fact_Ventas
                 {
                     OrderID = venta.o.OrderID,
                     TiempoID = tiempoID,
@@ -169,60 +222,91 @@ namespace LoadDWVentas.Data.Services
                     UnitPrice = venta.od.UnitPrice,
                     Discount = venta.od.Discount,
                     SaleAmount = venta.od.Quantity * venta.od.UnitPrice * (1 - (decimal)venta.od.Discount)
-                };
-
-                _dwhContext.Fact_Ventas.Add(factVenta);
+                });
             }
 
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("Ventas: sin nuevos registros.");
+                return;
+            }
+
+            _dwhContext.Fact_Ventas.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Ventas cargadas con éxito.");
+            _logger.LogInformation("Ventas cargadas con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadTiempoAsync()
         {
-            var fechas = _northwindContext.Orders
+            var existingFechas = new HashSet<DateTime>(
+                await _dwhContext.DimTiempo.AsNoTracking()
+                    .Select(t => t.Fecha)
+                    .ToListAsync());
+
+            var fechas = await _northwindContext.Orders.AsNoTracking()
                 .Where(o => o.OrderDate.HasValue)
-                .Select(o => o.OrderDate.GetValueOrDefault())
+                .Select(o => o.OrderDate!.Value)
                 .Distinct()
-                .ToList();
+                .ToListAsync();
+
+            var nuevos = new List<DimTiempo>();
 
             foreach (var fecha in fechas)
             {
-                if (!_dwhContext.DimTiempo.Any(t => t.Fecha == fecha))
+                if (existingFechas.Contains(fecha))
                 {
-                    var dimTiempo = new DimTiempo
-                    {
-                        Fecha = fecha,
-                        Año = fecha.Year,
-                        Mes = fecha.Month
-                    };
-
-                    _dwhContext.DimTiempo.Add(dimTiempo);
+                    continue;
                 }
+
+                nuevos.Add(new DimTiempo
+                {
+                    Fecha = fecha,
+                    Año = fecha.Year,
+                    Mes = fecha.Month
+                });
             }
 
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("DimTiempo: sin nuevos registros.");
+                return;
+            }
+
+            _dwhContext.DimTiempo.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Dimensión de Tiempo cargada con éxito.");
+            _logger.LogInformation("Dimensión de Tiempo cargada con éxito: {count}.", nuevos.Count);
         }
 
         public async Task LoadClienteAtendidoAsync()
         {
-            var clientesAtendidos = _northwindContext.Orders
-                .Join(_northwindContext.Customers, o => o.CustomerID, c => c.CustomerID, (o, c) => new { o, c })
-                .ToList();
+            var tiempoMap = await _dwhContext.DimTiempo.AsNoTracking()
+                .ToDictionaryAsync(t => t.Fecha, t => t.TiempoID);
+
+            var existingOrderIds = new HashSet<int>(
+                await _dwhContext.Fact_ClienteAtendido.AsNoTracking()
+                    .Select(f => f.OrderID)
+                    .ToListAsync());
+
+            var clientesAtendidos = await _northwindContext.Orders.AsNoTracking()
+                .Join(_northwindContext.Customers.AsNoTracking(), o => o.CustomerID, c => c.CustomerID, (o, c) => new { o, c })
+                .ToListAsync();
+
+            var nuevos = new List<Fact_ClienteAtendido>();
 
             foreach (var item in clientesAtendidos)
             {
-                var tiempo = _dwhContext.DimTiempo.FirstOrDefault(t => t.Fecha == item.o.OrderDate);
-                int tiempoID = tiempo != null ? tiempo.TiempoID : 0;
+                if (existingOrderIds.Contains(item.o.OrderID))
+                {
+                    continue;
+                }
 
-                if (tiempoID == 0)
+                if (item.o.OrderDate == null || !tiempoMap.TryGetValue(item.o.OrderDate.Value, out var tiempoID))
                 {
                     _logger.LogWarning("No se encontró TiempoID para la fecha {0} de OrderID {1}.", item.o.OrderDate, item.o.OrderID);
                     continue;
                 }
 
-                var factClienteAtendido = new Fact_ClienteAtendido
+                nuevos.Add(new Fact_ClienteAtendido
                 {
                     OrderID = item.o.OrderID,
                     CustomerID = item.o.CustomerID ?? "Unknown",
@@ -236,13 +320,18 @@ namespace LoadDWVentas.Data.Services
                     EstadoFinal = "Completado",
                     RequirioEscalamiento = false,
                     MontoTransaccion = item.o.Freight ?? 0
-                };
-
-                _dwhContext.Fact_ClienteAtendido.Add(factClienteAtendido);
+                });
             }
 
+            if (nuevos.Count == 0)
+            {
+                _logger.LogInformation("ClienteAtendido: sin nuevos registros.");
+                return;
+            }
+
+            _dwhContext.Fact_ClienteAtendido.AddRange(nuevos);
             await _dwhContext.SaveChangesAsync();
-            _logger.LogInformation("Hechos de Cliente Atendido cargados con éxito.");
+            _logger.LogInformation("Hechos de Cliente Atendido cargados con éxito: {count}.", nuevos.Count);
         }
         public async Task<List<vwFactVentas>> GetFactVentasAsync()
         {
