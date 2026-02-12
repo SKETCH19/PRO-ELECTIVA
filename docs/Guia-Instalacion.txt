@@ -1,0 +1,64 @@
+Guia para descargar y ejecutar el proyecto (Big Data / DWH + Power BI)
+
+Archivo de Power BI: Projecto BI.pbix
+
+1) Requisitos (instalar una vez)
+- Git (para descargar el proyecto).
+- .NET SDK 8.
+- SQL Server (Express o Developer).
+- SSMS o Azure Data Studio (para correr el script SQL).
+- Power BI Desktop.
+
+2) Descargar el proyecto
+- Abrir una terminal y ejecutar:
+  git clone <URL_DEL_REPOSITORIO>
+- Entrar a la carpeta del proyecto:
+  cd PRO-ELECTIVA
+
+3) Preparar las bases de datos
+- Tener una instancia de SQL Server encendida.
+- Crear la base de datos de origen: Northwind.
+  - Debe contener datos de ejemplo.
+- Crear la base de datos destino: DWHNorthwindOrders.
+  - Puede estar vacia, se llenara con el ETL.
+
+4) Configurar la conexion
+- Abrir el archivo:
+  LOADDWVENTAS.WorkerService/appsettings.json
+- Cambiar las cadenas de conexion para que apunten a tu SQL Server.
+  Ejemplo con autenticacion de Windows:
+  Server=TU_SERVIDOR;Database=Northwind;Trusted_Connection=True;TrustServerCertificate=True;
+  Server=TU_SERVIDOR;Database=DWHNorthwindOrders;Trusted_Connection=True;TrustServerCertificate=True;
+  Ejemplo con usuario y password:
+  Server=localhost,1433;Database=Northwind;User ID=sa;Password=YourStrong!Pass;TrustServerCertificate=True;
+  Server=localhost,1433;Database=DWHNorthwindOrders;User ID=sa;Password=YourStrong!Pass;TrustServerCertificate=True;
+
+5) Crear vistas e indices del DWH
+- Abrir SSMS o Azure Data Studio.
+- Ejecutar el script:
+  sql/DWHNorthwindOrders_setup.sql
+
+6) Ejecutar el ETL (carga de datos)
+- En la terminal, ejecutar:
+  dotnet run --project LOADDWVENTAS.WorkerService/LOADDWVENTAS.WorkerService.csproj
+- Esperar a que termine. Esto llena el DWH con las tablas y hechos.
+
+7) Abrir Power BI
+- Abrir el archivo:
+  Projecto BI.pbix
+- Si te pide credenciales, usa las mismas del paso 4.
+- Si no carga datos, en Power BI usa: Inicio > Actualizar.
+
+8) Validar que todo esta bien
+- En SQL Server, revisar que haya filas en:
+  - Fact_Ventas
+  - Fact_ClienteAtendido
+  - Dim_Tiempo, Dim_Producto, Dim_Cliente, Dim_Empleado, Dim_Shipper
+
+Solucion de problemas comunes
+- Error de conexion: revisa el nombre del servidor en appsettings.json.
+- Error de login: verifica usuario y password, o usa Trusted_Connection=True.
+- Power BI sin datos: ejecuta el ETL de nuevo y luego Actualizar.
+- No existe Northwind: instala la base de datos Northwind con datos de ejemplo.
+
+Listo. Con esto cualquier usuario puede descargar, cargar datos y abrir el reporte en Power BI.
